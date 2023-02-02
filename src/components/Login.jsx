@@ -3,15 +3,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import axios from "../api/axios";
-
+import { useContext } from "react";
+import AuthContext from "../context/AuthProvider";
 const Login_URL = "/auth";
 
 const Login = () => {
+  const { auth, setAuth } = useContext(AuthContext); //state updater func is plucked from context, but not auth state, why? no need for the default value of auth here in this component.
+  // console.log(auth) this prints the updated auth value after submit has been pressed.
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [success, setSuccess] = useState(false);
   const [errMsg, setErrMsg] = useState("");
-
+  
   const userRef = useRef();
 
   useEffect(() => {
@@ -25,7 +28,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     //async function always returns a promise
     e.preventDefault();
-    console.log(user, pwd);
+
     try {
       const response = await axios.post(
         //await uses yield statements
@@ -35,11 +38,18 @@ const Login = () => {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
-      );
-
-      setSuccess(true);
-      console.log(response?.data);
-      console.log(JSON.stringify(response));
+        );
+        
+        setSuccess(true);
+        // console.log(response?.data);
+        // console.log(JSON.stringify(response));
+        const roles = response?.data?.currentUser.roles;
+        console.log(roles);
+        const accessToken = response?.data?.accessToken;
+        setAuth({ user, pwd, roles, accessToken }); //how can this be useful in the global context? Because now I can use these variables in different components to show content based on the user who has logged in.
+        setUser("");
+        setPwd("");
+        console.log(user,pwd) //control flow reaches here before executing the setState which is waiting in the queue
     } catch (error) {
       if (!error?.response) {
         setErrMsg("No server response");
