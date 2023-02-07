@@ -3,13 +3,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import axios from "../api/axios";
-import { useContext } from "react";
-import AuthContext from "../context/AuthProvider";
+import useAuth from "../hooks/useAuth";
 const Login_URL = "/auth";
 
 const Login = () => {
-  const { auth, setAuth } = useContext(AuthContext); //state updater func is plucked from context, but not auth state, why? no need for the default value of auth here in this component.
-  // console.log(auth) this prints the updated auth value after submit has been pressed.
+  const {auth,setAuth} = useAuth() //why is curly braces used here? Because useContext returns an object of state values
+  console.log(auth)
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [success, setSuccess] = useState(false);
